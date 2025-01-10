@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  node-app:
+    build: .
+    container_name: node-app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - rabbitmq
+    environment:
+      - RABBITMQ_URL=rabbitmq://rabbitmq:5672
+
+  rabbitmq:
+    image: "rabbitmq:management"
+    container_name: rabbitmq
+    ports:
+      - "15672:15672" # Interface de gerenciamento
+      - "5672:5672" # Porta para comunicação com o RabbitMQ

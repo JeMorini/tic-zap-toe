@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext", // Gera módulos ESNext
+    "moduleResolution": "Node", // Resolve módulos no estilo Node.js
+    "strict": true, // Habilita verificações estritas
+    "esModuleInterop": true, // Permite interoperabilidade com CommonJS
+    "skipLibCheck": true // Ignora checagem de bibliotecas para acelerar
+  },
+  "include": ["src"],
+  "exclude": ["node_modules"]
+}
