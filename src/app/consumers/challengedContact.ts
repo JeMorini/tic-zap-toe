@@ -1,15 +1,15 @@
-import { sendMessageService } from "../services/sendMessageService.js";
+import { sendMessageService } from "../services/sendMessageService";
 
 const QUEUE_NAME = "challengedContact";
 
-export async function challengedContact(channel, sock) {
+export async function challengedContact(channel: any, sock: any) {
   channel.consume(
     QUEUE_NAME,
-    async (msg) => {
+    async (msg: any) => {
       if (msg) {
         console.log("Mensagem recebida:", msg.content.toString());
         // Enviar a mensagem (aqui você pode chamar o método de envio de mensagens)
-        sendMessageService(msg, channel, sock);
+        sendMessageService(msg, sock);
       }
     },
     { noAck: false }

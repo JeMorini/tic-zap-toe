@@ -1,6 +1,7 @@
-import { publishToQueue } from "./rabbitService.js";
+import { publishToQueue } from "./rabbitService";
+import { Messages } from "../../interfaces/messages.interface";
 
-export async function receiveMessageService(messages) {
+export async function receiveMessageService(messages: Array<Messages>) {
   const message = messages[0];
 
   const messageType = Object.keys(message.message)[0];

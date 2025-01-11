@@ -3,9 +3,9 @@ import {
   makeWASocket,
   fetchLatestBaileysVersion,
 } from "@whiskeysockets/baileys";
-import { connectToRabbitMQ } from "../configs/rabbitMQ.js";
-import { receiveMessageService } from "./receiveMessageService.js";
-import { startConsumers } from "../consumers/index.js";
+import { connectToRabbitMQ } from "../configs/rabbitMQ";
+import { receiveMessageService } from "./receiveMessageService";
+import { startConsumers } from "../consumers/index";
 
 export async function startBotService() {
   try {
@@ -23,11 +23,11 @@ export async function startBotService() {
     sock.ev.on("creds.update", saveCreds); // Salva as credenciais após autenticação
 
     // Envia mensagens para a fila do RabbitMQ ao receber uma mensagem
-    sock.ev.on("messages.upsert", async ({ messages }) => {
+    sock.ev.on("messages.upsert", async ({ messages }: any) => {
       receiveMessageService(messages);
     });
 
-    sock.ev.on("connection.update", (update) => {
+    sock.ev.on("connection.update", (update: any) => {
       const { connection, lastDisconnect } = update;
       if (connection === "close") {
         const shouldReconnect =

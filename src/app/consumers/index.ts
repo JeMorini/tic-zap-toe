@@ -1,9 +1,9 @@
-import { firstMessage } from "./firstMessage.js";
-import { challengedContact } from "./challengedContact.js";
+import { firstMessage } from "./firstMessage";
+import { challengedContact } from "./challengedContact";
 
 const consumers = [firstMessage, challengedContact];
 
-export async function startConsumers(channel, sock) {
+export async function startConsumers(channel: any, sock: any) {
   consumers.map((consumer) => {
     try {
       consumer(channel, sock);

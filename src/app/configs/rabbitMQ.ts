@@ -1,12 +1,14 @@
 import amqp from "amqplib";
 import dotenv from "dotenv";
+import { RabbitMQConnection } from "../../interfaces/rabbitMQ.interface";
 
 const queues = ["firstMessage", "challengedContact"]; // Array com os nomes das filas
 
-export async function connectToRabbitMQ() {
+dotenv.config();
+
+export async function connectToRabbitMQ(): Promise<RabbitMQConnection> {
   try {
-    // Substitua pela sua URL do CloudAMQP
-    const connection = await amqp.connect(process.env.RABBITMQ_URL);
+    const connection = await amqp.connect(process.env.RABBITMQ_URL || "");
     const channel = await connection.createChannel();
 
     // Inicializa todas as filas do array
@@ -18,5 +20,6 @@ export async function connectToRabbitMQ() {
     return { connection, channel };
   } catch (error) {
     console.error("Erro ao conectar ao RabbitMQ:", error);
+    throw new Error("Erro ao conectar ao RabbitMQ");
   }
 }

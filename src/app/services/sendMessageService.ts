@@ -1,11 +1,11 @@
-import { createCache } from "./redisService.js";
+import { createCache } from "./redisService";
 
-export async function sendMessageService(msg, channel, sock) {
+export async function sendMessageService(msg: any, sock: any) {
   const { sender, text, challenger, challenged, type } = JSON.parse(
     msg.content.toString()
   );
 
-  const sendMessage = async (number, message) => {
+  const sendMessage = async (number: string, message: string) => {
     const jid = number;
 
     try {
