@@ -1,8 +1,8 @@
 import { MessageService } from "../services/sendMessageService";
 
-const QUEUE_NAME = "challengedContact";
+const QUEUE_NAME = "gameAccepted";
 
-export async function challengedContact(channel: any, sock: any) {
+export async function gameAccepted(channel: any, sock: any) {
   channel.consume(
     QUEUE_NAME,
     async (msg: any) => {

@@ -1,4 +1,4 @@
-import { sendMessageService } from "../services/sendMessageService";
+import { MessageService } from "../services/sendMessageService";
 
 const QUEUE_NAME = "firstMessage";
 
@@ -8,8 +8,8 @@ export async function firstMessage(channel: any, sock: any) {
     async (msg: any) => {
       if (msg) {
         console.log("Mensagem recebida:", msg.content.toString());
-        // Enviar a mensagem (aqui você pode chamar o método de envio de mensagens)
-        sendMessageService(msg, sock);
+        const messageService = new MessageService(sock, channel, msg);
+        messageService.processMessage();
       }
     },
     { noAck: false }

@@ -1,3 +1,8 @@
-import { startBotService } from "./app/services/startBotService";
+import { BotService } from "./app/services/startBotService";
 
-startBotService();
+async function main() {
+  const botService = new BotService();
+  await botService.start();
+}
+
+main();

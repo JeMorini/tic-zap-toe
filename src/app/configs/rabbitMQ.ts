@@ -2,7 +2,13 @@ import amqp from "amqplib";
 import dotenv from "dotenv";
 import { RabbitMQConnection } from "../../interfaces/rabbitMQ.interface";
 
-const queues = ["firstMessage", "challengedContact"]; // Array com os nomes das filas
+const queues = [
+  "firstMessage",
+  "challengedContact",
+  "gameAccepted",
+  "gameRefused",
+  "incompatible",
+];
 
 dotenv.config();
 

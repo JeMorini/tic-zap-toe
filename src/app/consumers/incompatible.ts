@@ -1,8 +1,8 @@
 import { MessageService } from "../services/sendMessageService";
 
-const QUEUE_NAME = "challengedContact";
+const QUEUE_NAME = "incompatible";
 
-export async function challengedContact(channel: any, sock: any) {
+export async function incompatible(channel: any, sock: any) {
   channel.consume(
     QUEUE_NAME,
     async (msg: any) => {

@@ -1,7 +1,16 @@
 import { firstMessage } from "./firstMessage";
 import { challengedContact } from "./challengedContact";
+import { gameAccepted } from "./gameAccepted";
+import { gameRefused } from "./gameRefused";
+import { incompatible } from "./incompatible";
 
-const consumers = [firstMessage, challengedContact];
+const consumers = [
+  firstMessage,
+  challengedContact,
+  gameAccepted,
+  gameRefused,
+  incompatible,
+];
 
 export async function startConsumers(channel: any, sock: any) {
   consumers.map((consumer) => {
