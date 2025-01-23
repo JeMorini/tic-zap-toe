@@ -45,15 +45,15 @@ export class ReceiveMessageService {
 
     if (cacheRegister) {
       const cacheData = await this.cacheService.getCache(cacheRegister);
-      const challenger = sender;
 
       if (cacheData) {
         const cache = JSON.parse(cacheData);
         this.validateMessage(
+          sender,
           cache.status,
           text || "",
-          challenger,
-          cacheRegister.challenged
+          cache.challenger,
+          cache.challenged
         );
       }
     }
@@ -80,15 +80,27 @@ export class ReceiveMessageService {
     publishToQueue("challengedContact", msgToQueue);
   }
 
+  private isValidCharacter(message: string, gameStatus: Array<Array<string>>) {
+    if (gameStatus.flat().includes(message) && /^[1-9]$/.test(message)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   private async validateMessage(
+    sender: string,
     status: string,
     message: string,
     challenger: string,
     challenged: string
   ): Promise<void> {
-    let type = "incompatible";
+    const cacheRegister = await this.cacheService.findKeyContainingString(
+      sender
+    );
+    const cacheData = await this.cacheService.getCache(cacheRegister);
 
-    console.log(status);
+    let type = "incompatible";
 
     switch (status) {
       case "awaiting":
@@ -102,13 +114,24 @@ export class ReceiveMessageService {
         break;
 
       case "playing":
+        if (cacheData) {
+          const cache = JSON.parse(cacheData);
+
+          if (cache.currentPlayer !== sender) {
+            type = "wrongTime";
+          } else if (!this.isValidCharacter(message, cache.gameStatus)) {
+            type = "wrongCharacter";
+          } else {
+            type = "play";
+          }
+        }
         break;
 
       default:
         type = "incompatible";
     }
     let msgToQueue = Buffer.from(
-      JSON.stringify({ challenger, challenged, type })
+      JSON.stringify({ sender, challenger, challenged, type, message })
     );
 
     publishToQueue(type, msgToQueue);
