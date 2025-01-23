@@ -3,6 +3,7 @@ import { challengedContact } from "./challengedContact";
 import { gameAccepted } from "./gameAccepted";
 import { gameRefused } from "./gameRefused";
 import { incompatible } from "./incompatible";
+import { play } from "./play";
 
 const consumers = [
   firstMessage,
@@ -10,6 +11,7 @@ const consumers = [
   gameAccepted,
   gameRefused,
   incompatible,
+  play,
 ];
 
 export async function startConsumers(channel: any, sock: any) {

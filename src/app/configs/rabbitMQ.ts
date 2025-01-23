@@ -8,6 +8,7 @@ const queues = [
   "gameAccepted",
   "gameRefused",
   "incompatible",
+  "play",
 ];
 
 dotenv.config();
