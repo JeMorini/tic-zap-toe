@@ -61,4 +61,21 @@ export class CacheService {
 
     return foundKey || null;
   }
+
+  public async deleteCache(key: string): Promise<boolean> {
+    await this.init();
+    try {
+      const result = await this.client.del(key);
+      if (result === 1) {
+        console.log(`Cache deletado: { key: "${key}" }`);
+        return true;
+      } else {
+        console.log(`Chave não encontrada: { key: "${key}" }`);
+        return false;
+      }
+    } catch (error) {
+      console.error("Erro ao deletar cache:", error);
+      return false;
+    }
+  }
 }

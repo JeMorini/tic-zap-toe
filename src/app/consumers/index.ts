@@ -4,6 +4,9 @@ import { gameAccepted } from "./gameAccepted";
 import { gameRefused } from "./gameRefused";
 import { incompatible } from "./incompatible";
 import { play } from "./play";
+import { wrongCharacter } from "./wrongCharacter";
+import { wrongTime } from "./wrongTime";
+import { gameInProgress } from "./gameInProgress";
 
 const consumers = [
   firstMessage,
@@ -12,6 +15,9 @@ const consumers = [
   gameRefused,
   incompatible,
   play,
+  wrongCharacter,
+  wrongTime,
+  gameInProgress,
 ];
 
 export async function startConsumers(channel: any, sock: any) {

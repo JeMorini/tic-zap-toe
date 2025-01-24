@@ -33,7 +33,7 @@ export class MessageService {
           status || { status: null }
         );
       }
-      this.channel.ack(type);
+      this.channel.ack(this.msg);
     } catch (err) {
       console.error("Erro ao enviar mensagem:", err);
     }
@@ -162,6 +162,17 @@ Digite 1 para ACEITAR ou 2 para RECUSAR!`,
         this.cacheService.createCache(`${challenger}&${challenged}`, cache);
         break;
 
+      case "gameRefused":
+        await this.sendMessage(
+          `${challenged}@s.whatsapp.net`,
+          {
+            text: `${challenger} recusou a partida!`,
+          },
+          type
+        );
+        this.cacheService.deleteCache(`${challenger}&${challenged}`);
+        break;
+
       case "play":
         cache.currentPlayer =
           cache.currentPlayer === challenger ? challenged : challenger;
@@ -170,36 +181,103 @@ Digite 1 para ACEITAR ou 2 para RECUSAR!`,
           message,
           cache.currentPlayer === challenger ? "X" : "O"
         );
-        const newTictactoe = await ticTacToe.generateImage(cache.gameStatus);
-        await this.sendMultipleMessages(
-          [
-            {
-              jid: challenger,
-              message: {
-                caption: `Show! Agora é a vez do seu adversário`,
-                image: newTictactoe,
+        const winner = ticTacToe.checkWinner(cache.gameStatus);
+        if (winner) {
+          await this.sendMultipleMessages(
+            [
+              {
+                jid: challenger,
+                message: {
+                  text:
+                    winner === "O" ? `Parabens, você venceu!` : `Você perdeu!`,
+                },
               },
-            },
-            {
-              jid: challenged,
-              message: {
-                caption: `Seu adversário jogou, sua vez!`,
-                image: newTictactoe,
+              {
+                jid: challenged,
+                message: {
+                  text:
+                    winner === "X" ? `Parabens, você venceu!` : `Você perdeu!`,
+                },
               },
-            },
-          ],
+            ],
+            type
+          );
+          this.cacheService.deleteCache(`${challenger}&${challenged}`);
+        } else if (ticTacToe.isTie(cache.gameStatus)) {
+          await this.sendMultipleMessages(
+            [
+              {
+                jid: challenger,
+                message: {
+                  text: "O jogo terminou em empate!",
+                },
+              },
+              {
+                jid: challenged,
+                message: {
+                  text: "O jogo terminou em empate!",
+                },
+              },
+            ],
+            type
+          );
+          this.cacheService.deleteCache(`${challenger}&${challenged}`);
+        } else {
+          const newTictactoe = await ticTacToe.generateImage(cache.gameStatus);
+          await this.sendMultipleMessages(
+            [
+              {
+                jid: challenger,
+                message: {
+                  caption: `Show! Agora é a vez do seu adversário`,
+                  image: newTictactoe,
+                },
+              },
+              {
+                jid: challenged,
+                message: {
+                  caption: `Seu adversário jogou, sua vez!`,
+                  image: newTictactoe,
+                },
+              },
+            ],
+            type
+          );
+
+          this.cacheService.createCache(`${challenger}&${challenged}`, cache);
+        }
+
+        break;
+
+      case "wrongCharacter":
+        await this.sendMessage(
+          sender,
+          { text: `Mensagem enviada não é válida!` },
           type
         );
+        break;
 
-        this.cacheService.createCache(`${challenger}&${challenged}`, cache);
+      case "wrongTime":
+        await this.sendMessage(
+          sender,
+          { text: `Ainda não é sua vez de jogar!` },
+          type
+        );
+        break;
 
+      case "gameInProgress":
+        await this.sendMessage(
+          challenger,
+          { text: `Você já está em uma partida, não pode iniciar outra!` },
+          type
+        );
         break;
 
       default:
         await this.sendMessage(
           sender,
           { text: `Recebemos sua mensagem: "${text}"` },
-          "firstMessage"
+          type
         );
     }
   }

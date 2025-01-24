@@ -9,6 +9,9 @@ const queues = [
   "gameRefused",
   "incompatible",
   "play",
+  "wrongCharacter",
+  "wrongTime",
+  "gameInProgress",
 ];
 
 dotenv.config();

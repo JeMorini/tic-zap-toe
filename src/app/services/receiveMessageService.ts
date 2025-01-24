@@ -61,23 +61,23 @@ export class ReceiveMessageService {
 
   private async handleContactMessage(message: Messages): Promise<void> {
     const contact = message.message.contactMessage;
-    console.log("Nome:", contact.displayName);
 
     const match = contact.vcard.match(/TEL.*:(\+?\d[\d\s\-.()]+)/);
     const phoneNumber = match
       ? match[1].replace(/[\s\-.()]/g, "").replace(/^\+/, "")
       : null;
 
-    console.log("Número:", phoneNumber); // Extrai o número
-
     const challenger = message.key.remoteJid;
     const challenged = phoneNumber;
-    const type = "challengedContact";
+    const cacheRegister = await this.cacheService.findKeyContainingString(
+      message.key.remoteJid
+    );
+    const type = cacheRegister ? "gameInProgress" : "challengedContact";
 
     const msgToQueue = Buffer.from(
       JSON.stringify({ challenger, challenged, type })
     );
-    publishToQueue("challengedContact", msgToQueue);
+    publishToQueue(type, msgToQueue);
   }
 
   private isValidCharacter(message: string, gameStatus: Array<Array<string>>) {
