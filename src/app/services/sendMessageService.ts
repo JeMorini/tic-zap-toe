@@ -16,7 +16,7 @@ export class MessageService {
 
   private async sendMessage(
     number: string,
-    message: { text: string; image?: Buffer },
+    message: { text: string; image?: Buffer; mentions?: any },
     type: string,
     challenger?: string | null,
     challenged?: string | null,
@@ -42,7 +42,12 @@ export class MessageService {
   private async sendMultipleMessages(
     messages: Array<{
       jid: string;
-      message: { text?: string; image?: Buffer; caption?: string };
+      message: {
+        text?: string;
+        image?: Buffer;
+        caption?: string;
+        mentions?: any;
+      };
     }>,
     type: string
   ): Promise<void> {
@@ -108,7 +113,9 @@ export class MessageService {
       case "firstMessage":
         await this.sendMessage(
           sender,
-          { text: `Envie o contato de quem gostaria de desafiar!` },
+          {
+            text: `Bem vindo ao Tic Zap Toe 🔵❌! Para começar a jogar é muito simples, apenas envie o contato de quem gostaria de desafiar!`,
+          },
           type,
           null,
           null
@@ -120,8 +127,12 @@ export class MessageService {
         await this.sendMessage(
           `${challenged}@s.whatsapp.net`,
           {
-            text: `${challenger} desafiou você para uma partida de jogo da velha, aceita?!
+            text: `@${challenger.replace(
+              "@s.whatsapp.net",
+              ""
+            )} desafiou você para uma partida de jogo da velha, aceita?!
 Digite 1 para ACEITAR ou 2 para RECUSAR!`,
+            mentions: [challenger],
           },
           type,
           challenger,
@@ -142,14 +153,17 @@ Digite 1 para ACEITAR ou 2 para RECUSAR!`,
             {
               jid: challenger,
               message: {
-                text: `${challenged} aceitou seu desafio! Vamos começar!`,
+                caption: `Seu desafio foi aceito, vamos começar! Você é o 🔵 e você começa! Digite o número de onde quer jogar!`,
+                image: tictactoe,
+                mentions: [challenged],
               },
             },
             {
               jid: challenged,
               message: {
-                caption: `Legal! Iremos comunicar o ${challenger} e começaremos o jogo!`,
+                caption: `Legal! Iremos começar o jogo! Você é o ❌, assim que seu adversário jogar, será sua vez!`,
                 image: tictactoe,
+                mentions: [challenger],
               },
             },
           ],
@@ -181,6 +195,8 @@ Digite 1 para ACEITAR ou 2 para RECUSAR!`,
           message,
           cache.currentPlayer === challenger ? "X" : "O"
         );
+        const newTictactoe = await ticTacToe.generateImage(cache.gameStatus);
+
         const winner = ticTacToe.checkWinner(cache.gameStatus);
         if (winner) {
           await this.sendMultipleMessages(
@@ -188,15 +204,21 @@ Digite 1 para ACEITAR ou 2 para RECUSAR!`,
               {
                 jid: challenger,
                 message: {
-                  text:
-                    winner === "O" ? `Parabens, você venceu!` : `Você perdeu!`,
+                  caption:
+                    winner === "O"
+                      ? `Parabens, você venceu!`
+                      : `Que pena, você perdeu!`,
+                  image: newTictactoe,
                 },
               },
               {
                 jid: challenged,
                 message: {
-                  text:
-                    winner === "X" ? `Parabens, você venceu!` : `Você perdeu!`,
+                  caption:
+                    winner === "X"
+                      ? `Parabens, você venceu! 🎉`
+                      : `Que pena, você perdeu! 😔`,
+                  image: newTictactoe,
                 },
               },
             ],
@@ -209,13 +231,15 @@ Digite 1 para ACEITAR ou 2 para RECUSAR!`,
               {
                 jid: challenger,
                 message: {
-                  text: "O jogo terminou em empate!",
+                  caption: "Uau! O jogo terminou em empate!",
+                  image: newTictactoe,
                 },
               },
               {
                 jid: challenged,
                 message: {
-                  text: "O jogo terminou em empate!",
+                  caption: "Uau! O jogo terminou em empate!",
+                  image: newTictactoe,
                 },
               },
             ],
@@ -223,20 +247,27 @@ Digite 1 para ACEITAR ou 2 para RECUSAR!`,
           );
           this.cacheService.deleteCache(`${challenger}&${challenged}`);
         } else {
-          const newTictactoe = await ticTacToe.generateImage(cache.gameStatus);
           await this.sendMultipleMessages(
             [
               {
                 jid: challenger,
                 message: {
-                  caption: `Show! Agora é a vez do seu adversário`,
+                  caption:
+                    cache.currentPlayer === challenger
+                      ? `Seu adversário jogou, sua vez! Digite o número de onde quer jogar!
+Lembrando, você é o 🔵`
+                      : `Show! Agora é a vez do seu adversário, aguarde...`,
                   image: newTictactoe,
                 },
               },
               {
                 jid: challenged,
                 message: {
-                  caption: `Seu adversário jogou, sua vez!`,
+                  caption:
+                    cache.currentPlayer === challenged
+                      ? `Seu adversário jogou, sua vez! Digite o número de onde quer jogar!
+Lembrando, você é o ❌`
+                      : `Show! Agora é a vez do seu adversário, aguarde...`,
                   image: newTictactoe,
                 },
               },
@@ -260,7 +291,7 @@ Digite 1 para ACEITAR ou 2 para RECUSAR!`,
       case "wrongTime":
         await this.sendMessage(
           sender,
-          { text: `Ainda não é sua vez de jogar!` },
+          { text: `Aguarde, ainda é a vez do seu adversário!` },
           type
         );
         break;
