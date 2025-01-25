@@ -27,7 +27,7 @@ export class BotService {
       this.sock = makeWASocket({
         version,
         auth: state,
-        printQRInTerminal: true, // Exibe o QR Code no terminal para autenticação
+        printQRInTerminal: true,
       });
 
       this.registerEvents(this.sock, saveCreds);

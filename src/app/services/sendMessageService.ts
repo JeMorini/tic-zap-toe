@@ -1,5 +1,5 @@
 import { CacheService } from "./redisService";
-import { TicTacToeImage } from "./ticTacToeService";
+import { TicTacToeService } from "./ticTacToeService";
 
 export class MessageService {
   private sock: any;
@@ -28,7 +28,7 @@ export class MessageService {
       await this.sock.sendMessage(jid, message);
 
       if (challenger && challenged) {
-        this.cacheService.createCache(
+        this.cacheService.createOrUpdateCache(
           `${challenger}&${challenged}@s.whatsapp.net`,
           status || { status: null }
         );
@@ -94,7 +94,7 @@ export class MessageService {
 
     const cacheData = await this.cacheService.getCache(cacheString);
     let cache;
-    const ticTacToe = new TicTacToeImage();
+    const ticTacToeService = new TicTacToeService();
     let tictactoe;
     let boardGame;
 
@@ -106,7 +106,9 @@ export class MessageService {
         ["7", "8", "9"],
       ];
 
-      tictactoe = await ticTacToe.generateImage(cache.gameStatus || boardGame);
+      tictactoe = await ticTacToeService.generateImage(
+        cache.gameStatus || boardGame
+      );
     }
 
     switch (type) {
@@ -173,7 +175,10 @@ Digite 1 para ACEITAR ou 2 para RECUSAR!`,
         cache.currentPlayer =
           cache.currentPlayer === challenger ? challenged : challenger;
         cache.gameStatus = boardGame;
-        this.cacheService.createCache(`${challenger}&${challenged}`, cache);
+        this.cacheService.createOrUpdateCache(
+          `${challenger}&${challenged}`,
+          cache
+        );
         break;
 
       case "gameRefused":
@@ -195,9 +200,11 @@ Digite 1 para ACEITAR ou 2 para RECUSAR!`,
           message,
           cache.currentPlayer === challenger ? "X" : "O"
         );
-        const newTictactoe = await ticTacToe.generateImage(cache.gameStatus);
+        const newTictactoe = await ticTacToeService.generateImage(
+          cache.gameStatus
+        );
 
-        const winner = ticTacToe.checkWinner(cache.gameStatus);
+        const winner = ticTacToeService.checkWinner(cache.gameStatus);
         if (winner) {
           await this.sendMultipleMessages(
             [
@@ -225,7 +232,7 @@ Digite 1 para ACEITAR ou 2 para RECUSAR!`,
             type
           );
           this.cacheService.deleteCache(`${challenger}&${challenged}`);
-        } else if (ticTacToe.isTie(cache.gameStatus)) {
+        } else if (ticTacToeService.isTie(cache.gameStatus)) {
           await this.sendMultipleMessages(
             [
               {
@@ -275,7 +282,10 @@ Lembrando, você é o ❌`
             type
           );
 
-          this.cacheService.createCache(`${challenger}&${challenged}`, cache);
+          this.cacheService.createOrUpdateCache(
+            `${challenger}&${challenged}`,
+            cache
+          );
         }
 
         break;

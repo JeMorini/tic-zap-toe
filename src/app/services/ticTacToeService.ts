@@ -1,6 +1,11 @@
 import { createCanvas } from "canvas";
 
-export class TicTacToeImage {
+export class TicTacToeService {
+  size: number;
+  cellSize: number;
+  canvas: any;
+  ctx: any;
+
   constructor(size = 300) {
     this.size = size;
     this.cellSize = this.size / 3;
@@ -8,9 +13,7 @@ export class TicTacToeImage {
     this.ctx = this.canvas.getContext("2d");
   }
 
-  drawGrid() {
-    console.log("CHEGOOOOOOUUUUUUUUUU");
-
+  private drawGrid() {
     const { ctx, size, cellSize } = this;
 
     ctx.fillStyle = "#ffffff";
@@ -36,8 +39,7 @@ export class TicTacToeImage {
     }
   }
 
-  drawSymbols(board) {
-    console.log("CHEGOOOOOOUUUUUUUUUU");
+  private drawSymbols(board: Array<string>) {
     const { ctx, cellSize } = this;
 
     ctx.font = `${cellSize / 2}px Arial`;
@@ -58,8 +60,7 @@ export class TicTacToeImage {
     }
   }
 
-  public checkWinner(board) {
-    // Verifica linhas, colunas e diagonais para um vencedor
+  public checkWinner(board: Array<string>) {
     const lines = [
       // Linhas
       [board[0][0], board[0][1], board[0][2]],
@@ -76,27 +77,25 @@ export class TicTacToeImage {
 
     for (let line of lines) {
       if (line[0] === line[1] && line[1] === line[2] && line[0] !== "") {
-        return line[0]; // Retorna o vencedor ("X" ou "O")
+        return line[0];
       }
     }
 
-    return null; // Sem vencedor
+    return null;
   }
 
-  public isTie(board) {
-    // Verifica se há algum espaço vazio ou número ainda disponível
+  public isTie(board: any) {
     for (let row of board) {
       for (let cell of row) {
         if (!isNaN(cell)) {
-          return false; // Ainda há jogadas disponíveis
+          return false;
         }
       }
     }
-    return true; // Tabuleiro cheio
+    return true;
   }
 
-  async generateImage(board) {
-    console.log("CHEGOOOOOOUUUUUUUUUU");
+  async generateImage(board: Array<string>) {
     this.drawGrid();
     this.drawSymbols(board);
     const buffer = this.canvas.toBuffer("image/png");
